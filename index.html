@@ -583,6 +583,94 @@
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
         
+        /* TOMBOL STALK USER - TAMBAHAN BARU */
+        .stalk-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            border: none;
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4);
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .stalk-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 176, 155, 0.6);
+        }
+        
+        /* MODAL STALK USER - TAMBAHAN BARU */
+        .stalk-modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        .stalk-profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .stalk-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .stalk-info p {
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .stalk-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        
+        .stalk-stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(5px);
+            min-width: 80px;
+        }
+        
+        .stalk-stat-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .stalk-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
         @media (max-width: 600px) {
             .container {
                 padding: 25px;
@@ -604,6 +692,11 @@
             .modal-header {
                 flex-direction: column;
                 text-align: center;
+            }
+            
+            .stalk-stats {
+                flex-direction: column;
+                align-items: center;
             }
         }
     </style>
@@ -659,11 +752,49 @@
                 <button class="download-link music" id="download-music-btn">Download Musik</button>
             </div>
             
+            <!-- TOMBOL STALK USER - TAMBAHAN BARU -->
+            <button class="stalk-btn" id="stalk-btn">
+                <span>🔍</span> Stalk User TikTok
+            </button>
+            
             <button class="toggle-api-response">Lihat Detail API Response</button>
             
             <div class="api-response">
                 <h3>Detail API Response</h3>
                 <pre id="api-response-content">API response akan ditampilkan di sini...</pre>
+            </div>
+        </div>
+        
+        <!-- Modal Stalk User - TAMBAHAN BARU -->
+        <div class="modal" id="stalk-modal">
+            <div class="stalk-modal-content">
+                <button class="close-modal" id="close-stalk-modal">×</button>
+                <div style="text-align: center;">
+                    <img src="" alt="Profile Picture" class="stalk-profile-pic" id="stalk-profile-pic">
+                    <div class="stalk-info">
+                        <h3 id="stalk-nickname">Nickname</h3>
+                        <p id="stalk-uniqueId">@username</p>
+                        <p id="stalk-signature">Signature</p>
+                    </div>
+                    <div class="stalk-stats">
+                        <div class="stalk-stat">
+                            <span class="stalk-stat-value" id="stalk-followers">0</span>
+                            <span class="stalk-stat-label">Followers</span>
+                        </div>
+                        <div class="stalk-stat">
+                            <span class="stalk-stat-value" id="stalk-following">0</span>
+                            <span class="stalk-stat-label">Following</span>
+                        </div>
+                        <div class="stalk-stat">
+                            <span class="stalk-stat-value" id="stalk-likes">0</span>
+                            <span class="stalk-stat-label">Likes</span>
+                        </div>
+                        <div class="stalk-stat">
+                            <span class="stalk-stat-value" id="stalk-videos">0</span>
+                            <span class="stalk-stat-label">Videos</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -730,14 +861,74 @@
             const adminModal = document.querySelector('#admin-modal');
             const closeModal = document.querySelector('#close-modal');
             
+            // ELEMEN STALK USER - TAMBAHAN BARU
+            const stalkBtn = document.querySelector('#stalk-btn');
+            const stalkModal = document.querySelector('#stalk-modal');
+            const closeStalkModal = document.querySelector('#close-stalk-modal');
+            const stalkProfilePic = document.querySelector('#stalk-profile-pic');
+            const stalkNickname = document.querySelector('#stalk-nickname');
+            const stalkUniqueId = document.querySelector('#stalk-uniqueId');
+            const stalkSignature = document.querySelector('#stalk-signature');
+            const stalkFollowers = document.querySelector('#stalk-followers');
+            const stalkFollowing = document.querySelector('#stalk-following');
+            const stalkLikes = document.querySelector('#stalk-likes');
+            const stalkVideos = document.querySelector('#stalk-videos');
+            
             // Variabel untuk menyimpan data video
             let videoData = null;
             let isAudioMuted = true;
+            let isProcessing = false; // Flag untuk mencegah multiple requests
             
             // API URL baru untuk download
             const API_URL_NEW = 'https://api.nvidiabotz.xyz/download/tiktok?url=';
             // API URL lama untuk data tampilan dan background video
             const API_URL_OLD = 'https://tikwm.com/api/?url=';
+            // API URL untuk stalk user TikTok
+            const STALK_API_URL = 'https://api.resellergaming.my.id/stalk/tiktok?username=';
+            
+            // Event listener untuk tombol stalk user - TAMBAHAN BARU
+            stalkBtn.addEventListener('click', async function() {
+                if (isProcessing) return;
+                
+                if (videoData && videoData.old && videoData.old.data && videoData.old.data.author) {
+                    const username = videoData.old.data.author.unique_id;
+                    
+                    // Tampilkan loading
+                    loading.style.display = 'block';
+                    isProcessing = true;
+                    
+                    try {
+                        const stalkData = await fetchStalkData(username);
+                        
+                        // Sembunyikan loading
+                        loading.style.display = 'none';
+                        isProcessing = false;
+                        
+                        // Tampilkan modal stalk user
+                        displayStalkData(stalkData);
+                        stalkModal.style.display = 'flex';
+                    } catch (error) {
+                        console.error('Error:', error);
+                        loading.style.display = 'none';
+                        isProcessing = false;
+                        showError('Gagal mengambil data user. Silakan coba lagi.');
+                    }
+                } else {
+                    showError('Data user tidak tersedia. Silakan download video terlebih dahulu.');
+                }
+            });
+            
+            // Event listener untuk menutup modal stalk user - TAMBAHAN BARU
+            closeStalkModal.addEventListener('click', function() {
+                stalkModal.style.display = 'none';
+            });
+            
+            // Tutup modal stalk user ketika klik di luar konten modal - TAMBAHAN BARU
+            stalkModal.addEventListener('click', function(e) {
+                if (e.target === stalkModal) {
+                    stalkModal.style.display = 'none';
+                }
+            });
             
             // Event listener untuk tombol info admin
             infoBtn.addEventListener('click', function() {
@@ -757,6 +948,8 @@
             });
             
             downloadBtn.addEventListener('click', async function() {
+                if (isProcessing) return;
+                
                 const url = urlInput.value.trim();
                 
                 if (!url) {
@@ -775,6 +968,7 @@
                 resultSection.style.display = 'none';
                 errorMessage.style.display = 'none';
                 apiResponse.style.display = 'none';
+                isProcessing = true;
                 
                 try {
                     // Panggil API lama untuk data tampilan dan background video
@@ -802,6 +996,7 @@
                         
                         // Sembunyikan loading
                         loading.style.display = 'none';
+                        isProcessing = false;
                         
                         // Simpan data video
                         videoData = {
@@ -828,6 +1023,8 @@
                     
                 } catch (error) {
                     console.error('Error:', error);
+                    loading.style.display = 'none';
+                    isProcessing = false;
                     showError('Gagal mengambil video. Silakan coba lagi dengan URL yang berbeda.');
                 }
             });
@@ -869,6 +1066,43 @@
                 audioToggle.textContent = isAudioMuted ? '🔇' : '🔊';
             });
             
+            // FUNGSI STALK USER - TAMBAHAN BARU
+            async function fetchStalkData(username) {
+                const apiUrl = `${STALK_API_URL}${encodeURIComponent(username)}`;
+                console.log('Mengambil data stalk user:', apiUrl);
+                
+                const response = await fetchWithRetry(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Data stalk user:', data);
+                
+                if (!data.status) {
+                    throw new Error(data.message || 'Gagal mengambil data user');
+                }
+                
+                return data;
+            }
+            
+            function displayStalkData(stalkData) {
+                const user = stalkData.result;
+                
+                // Set data profil user
+                stalkProfilePic.src = user.avatar;
+                stalkNickname.textContent = user.nickname;
+                stalkUniqueId.textContent = `@${user.uniqueId}`;
+                stalkSignature.textContent = user.signature || 'Tidak ada signature';
+                
+                // Set statistik user
+                stalkFollowers.textContent = formatNumber(user.followers);
+                stalkFollowing.textContent = formatNumber(user.following);
+                stalkLikes.textContent = formatNumber(user.likes);
+                stalkVideos.textContent = formatNumber(user.videos);
+            }
+            
             // Fungsi untuk mengatur background video
             function setBackgroundVideo(videoUrl) {
                 if (videoUrl) {
@@ -908,16 +1142,37 @@
                 return tiktokPatterns.some(pattern => pattern.test(url));
             }
             
+            // Fungsi fetch dengan retry untuk stabilitas - PERBAIKAN UTAMA
+            async function fetchWithRetry(url, options = {}, maxRetries = 3) {
+                let lastError;
+                
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response;
+                    } catch (error) {
+                        lastError = error;
+                        console.log(`Percobaan ${i + 1} gagal, mencoba lagi...`);
+                        
+                        // Tunggu sebelum mencoba lagi (exponential backoff)
+                        if (i < maxRetries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                        }
+                    }
+                }
+                
+                throw lastError;
+            }
+            
             // Fungsi untuk mengambil data dari API baru
             async function fetchTikTokDataNew(url) {
                 const apiUrl = `${API_URL_NEW}${encodeURIComponent(url)}`;
                 console.log('Mengambil data dari API baru:', apiUrl);
                 
-                const response = await fetch(apiUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                const response = await fetchWithRetry(apiUrl);
                 
                 const data = await response.json();
                 console.log('Data API baru:', data);
@@ -929,11 +1184,7 @@
                 const apiUrl = `${API_URL_OLD}${encodeURIComponent(url)}`;
                 console.log('Mengambil data dari API lama:', apiUrl);
                 
-                const response = await fetch(apiUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                const response = await fetchWithRetry(apiUrl);
                 
                 const data = await response.json();
                 console.log('Data API lama:', data);
@@ -1061,6 +1312,7 @@
                 loading.style.display = 'none';
                 errorMessage.style.display = 'block';
                 errorMessage.querySelector('p').textContent = message;
+                isProcessing = false;
             }
             
             // Auto-fill dengan URL dari clipboard jika ada
